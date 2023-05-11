@@ -180,7 +180,7 @@ This will run all tests in the '**tests**' directory.
   on the player have little to no functionality.
 
 - The web player continues to play music when the user logs out and returns to
-  the home page. This is an issue we plan to address in the future, but is not a
+  the home page. This is an issue we plan to address in the future, but it is not a
   core-functionality-breaking bug.
 
 ### Future Features (?)
