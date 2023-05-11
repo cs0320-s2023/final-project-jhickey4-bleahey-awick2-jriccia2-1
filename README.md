@@ -10,7 +10,7 @@ Justin Hickey (jhickey4)
 
 Alex Wick (awick2)
 
-Joey Ricciarduli (jriccia2)
+Joseph Ricciardulli (jriccia2)
 
 **Git Repo Link:**
 https://github.com/cs0320-s2023/final-project-jhickey4-bleahey-awick2-jriccia2
