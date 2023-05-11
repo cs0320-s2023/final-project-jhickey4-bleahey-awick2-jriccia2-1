@@ -185,6 +185,6 @@ This will run all tests in the '**tests**' directory.
 
 ### Future Features
 
-- Support for non-premium users: we know the webplayer is not available to these users, and have cut off access there. Ideally, on full release, we will be able to display the list of songs and generate a playlist even without a functioning webplayer, so the user may have the best experience possible even without premium.
+- Support for non-premium users: we know the webplayer is not available to these users, and the site stops functioning after songs are attempted to generate. Ideally, on full release, we will be able to display the list of songs and generate a playlist even without a functioning webplayer, so the user may have the best experience possible even without premium.
 - Full launch: improving our compliance with Spotify's privacy policy means we may petition for full access to Spotify api features, loosening the restrictions on number of users and more.
 - Personalized music: at the moment, we do not account for a user's tastes in the music generated. Accessing music from their library or filtering based on information from their profile could make CaDance a more personal experience.
