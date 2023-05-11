@@ -148,6 +148,18 @@ are then redirected back to the webapp. When considering how to integration test
 were unsure of how to login to Spotify in order to make our API calls. For that reason
 we were only able to unit test our endpoints and mock the API responses from Spotify.
 
+### DOM tests
+
+We also faced some roadblocks in testing the application's DOM. We were able to test
+for the presence of elements on the login page (index.tsx), such as the title, description,
+login button, and information section. However, we have not yet figured out a way to test
+for the functionality of the login button on that page because it redirects externally to
+Spotify's login page.
+
+Additionally, we were unable to DOM test loggedin.tsx because it requires a valid Spotify
+authorization code or access token to render. We were unable to figure out a way to mock
+a valid authorization code or access token in order to render the page.
+
 ### Running Tests
 
 Tests are provided in the '**tests**' directory of the project. To run tests,
@@ -166,5 +178,9 @@ This will run all tests in the '**tests**' directory.
 - The application does not work perfectly on Safari, as the Spotify Web Playback
   SDK is not supported on Safari. The application will still work, but the buttons
   on the player have little to no functionality.
+
+- The web player continues to play music when the user logs out and returns to
+  the home page. This is an issue we plan to address in the future, but is not a
+  core-functionality-breaking bug.
 
 ### Future Features (?)
