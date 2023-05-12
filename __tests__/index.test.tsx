@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import Home from "@/pages/index";
 import fetchMock from "jest-fetch-mock";
 
-fetchMock.enableMocks(); // enable mock fetch requests
+fetchMock.enableMocks();
 
 jest.mock("next/router", () => ({
   useRouter: jest.fn(),
@@ -14,14 +14,9 @@ describe("Home", () => {
   let mockRouterPush: jest.Mock;
 
   beforeEach(() => {
-    mockRouterPush = jest.fn();
+    mockRouterPush = jest.fn().mockResolvedValue(Promise.resolve());
     (useRouter as jest.Mock).mockReturnValue({ push: mockRouterPush });
     localStorage.clear();
-  });
-
-  test("does not navigate to loggedin page when tokens are not available", async () => {
-    render(<Home />);
-    await waitFor(() => expect(mockRouterPush).not.toHaveBeenCalled());
   });
 
   test("renders app title and description", () => {
@@ -67,5 +62,10 @@ describe("Home", () => {
     await waitFor(() =>
       expect(mockRouterPush).toHaveBeenCalledWith("/loggedin")
     );
+  });
+
+  test("does not navigate to loggedin page when tokens are not available", async () => {
+    render(<Home />);
+    await waitFor(() => expect(mockRouterPush).not.toHaveBeenCalled());
   });
 });
