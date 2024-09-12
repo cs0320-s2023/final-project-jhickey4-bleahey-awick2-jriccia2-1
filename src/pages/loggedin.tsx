@@ -4,7 +4,7 @@ import { Metronome } from "../scripts/metronome";
 import { NextRouter, useRouter } from "next/router";
 import { MetronomeController } from "@/components/MetronomeController";
 import WebPlayer from "@/components/WebPlayer";
-import { genres } from "@/resources/genres";
+import { genres } from "@/resources/arrays";
 import {
   HEAD_TITLE,
   APP_TITLE,
@@ -18,6 +18,8 @@ import {
   SESSION_EXPIRED_TEXT,
   RATE_LIMIT_TEXT,
   OPEN_IN_SPOTIFY_TEXT,
+  UNAUTHORIZED_TEXT,
+  HEAD_DESCRIPTION,
 } from "@/resources/strings";
 import { HR_ZONES } from "@/resources/metrics";
 import SpotifyButton, { SpotifyButtonAction } from "@/components/SpotifyButton";
@@ -64,7 +66,7 @@ export default function LoggedIn(): JSX.Element {
   const [webPlayerLoaded, setWebPlayerLoaded] = useState<boolean>(false);
   const [generatedPlaylistURL, setGeneratedPlaylistURL] = useState<string>("");
 
-  //used to navigate between pages
+  //used to navigate between the pages
   const router: NextRouter = useRouter();
   // Get the code and state from the URL query parameters
   const { code, state, error } = router.query;
@@ -112,7 +114,7 @@ export default function LoggedIn(): JSX.Element {
         setReady(true);
       } else if (access && refresh_token && expires_at) {
         if (refresh_token === "undefined") {
-          console.log("Logged out: invalid refresh token");
+          alert(SESSION_EXPIRED_TEXT);
           logout();
         } else if (new Date(expires_at).valueOf() - new Date().valueOf() <= 0) {
           fetch("/api/spotify/refresh?refresh_token=" + refresh_token)
@@ -142,10 +144,26 @@ export default function LoggedIn(): JSX.Element {
     }
   }, [code]);
 
+  // Stops the metronome when the mode is changed
+  useEffect(() => {
+    stopMetronome();
+  }, [mode]);
+
+  /**
+   * Stops to metronome if it is playing
+   */
+  function stopMetronome(): void {
+    if (metronomePlaying) {
+      metronome.stop();
+      setMetronomePlaying(false);
+    }
+  }
+
   /**
    * Helper function to logout the user
    */
   function logout(): void {
+    stopMetronome();
     localStorage.clear();
     sessionStorage.clear();
     router.push("/");
@@ -194,7 +212,7 @@ export default function LoggedIn(): JSX.Element {
             "&numsongs=" +
             numSongs +
             "&access_token=" +
-            localStorage.getItem("access_token") +
+            localStorage.getItem(ACCESS_TOKEN_NAME) +
             "&height=" +
             totalInches +
             "&male=" +
@@ -229,7 +247,7 @@ export default function LoggedIn(): JSX.Element {
             "&numsongs=" +
             numSongs +
             "&access_token=" +
-            localStorage.getItem("access_token") +
+            localStorage.getItem(ACCESS_TOKEN_NAME) +
             "&energy=" +
             energy +
             (HR !== undefined ? "&hr=" + HR : "");
@@ -237,7 +255,7 @@ export default function LoggedIn(): JSX.Element {
             .then((res) => {
               console.log("Fetched songs returned status " + res.status);
               if (res.status === 201) {
-                alert("Session expired. Please refresh page");
+                alert(SESSION_EXPIRED_TEXT);
               } else {
                 return res.json();
               }
@@ -259,17 +277,35 @@ export default function LoggedIn(): JSX.Element {
    */
   async function retrieveUserInfo(): Promise<void> {
     const url = "/api/spotify/profile?access_token=" + access_token;
+
     fetch(url)
-      .then((res) => res.json())
-      .then((json: SpotifyProfile) => {
-        if (
-          json.username !== null &&
-          json.username !== undefined &&
-          json.id !== null &&
-          json.id !== undefined
-        ) {
-          setProfile(json);
+      .then((res) => {
+        if (res.status === 403) {
+          alert(UNAUTHORIZED_TEXT);
+          logout();
+        } else if (res.status === 401) {
+          console.log("Logged out: missing authorization tokens");
+          logout();
+        } else {
+          res
+            .json()
+            .then((json: SpotifyProfile) => {
+              if (
+                json.username !== null &&
+                json.username !== undefined &&
+                json.id !== null &&
+                json.id !== undefined
+              ) {
+                setProfile(json);
+              }
+            })
+            .catch((err) => {
+              console.error(err);
+            });
         }
+      })
+      .catch((err) => {
+        console.error(err);
       });
   }
 
@@ -299,7 +335,6 @@ export default function LoggedIn(): JSX.Element {
    * @returns {Promise<void>}
    */
   async function generatePlaylist(songs: string[]): Promise<void> {
-    //TODO: Provide a link to the playlist in the UI
     let genres: string = "";
     selectedGenres.forEach((genre: string) => {
       genres = genres + genre + " ";
@@ -358,7 +393,7 @@ export default function LoggedIn(): JSX.Element {
         <>
           <Head>
             <title>{HEAD_TITLE}</title>
-            <meta name="description" content="Generated by create next app" />
+            <meta name="description" content={HEAD_DESCRIPTION} />
             <meta
               name="viewport"
               content="width=device-width, initial-scale=1"
@@ -375,16 +410,11 @@ export default function LoggedIn(): JSX.Element {
               </p>
               <SpotifyButton
                 action={SpotifyButtonAction.Logout}
-                router={router}
+                actionFunction={logout}
               />
             </div>
             <div className="input-fields">
-              <ModeSelect
-                setMode={setMode}
-                metronome={metronome}
-                metronomePlaying={metronomePlaying}
-                setMetronomePlaying={setMetronomePlaying}
-              />
+              <ModeSelect setMode={setMode} />
               {mode == Mode.Watch ? (
                 <>
                   <CadenceInput cadence={tempo} setCadence={setTempo} />
@@ -417,8 +447,8 @@ export default function LoggedIn(): JSX.Element {
                 />
 
                 <NumSongsSelect
-                  min={0}
-                  max={10}
+                  min={1}
+                  max={100}
                   numSongs={numSongs}
                   setNumSongs={setNumSongs}
                 />

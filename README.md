@@ -10,13 +10,13 @@ Justin Hickey (jhickey4)
 
 Alex Wick (awick2)
 
-Joey Ricciarduli (jriccia2)
+Joseph Ricciardulli (jriccia2)
 
 **Git Repo Link:**
 https://github.com/cs0320-s2023/final-project-jhickey4-bleahey-awick2-jriccia2
 
 **Description:**
-CaDance is a web applicationthat allows users to create short queues of songs
+CaDance is a web application that allows users to create short queues of songs
 that match up to their running cadence and estimated energy expenditure.
 
 **Privacy/Use of Data:**
@@ -53,11 +53,14 @@ To learn more about Next.js, take a look at the following resources:
 
 ## Getting Started
 
+### Prerequisites
+
+A Spotify Premium account is required to use CaDance's services, as Spotify's web player feature is limited to Premium users.
+
 ### Running the application -- users
 
-The application is found at \_\_\_ <!-- fill in vercel deployment --> and can be run on any device with a web browser.
-The application is optimized for computers, but can be run on mobile devices as
-well. (?)
+The application is [deployed on Vercel](https://cadance-deployment.vercel.app) and can be run on any device with a web browser.
+The application is optimized for computers, but can be run on mobile devices with moderate performance as well.
 
 Currently, this application is only available up to 25 users due to the
 limitations of the Spotify API. If you are unable to access the application,
@@ -137,7 +140,25 @@ for songs, and retrieving audio features for songs based on mocked data.
 
 ### Integration tests
 
-TODO
+We faced a roadblock in testing the application's integration with the Spotify API.
+The main issue here is that to make queries to the Spotify API, we need to log in with
+a valid Spotify Premium account. The way that we do this is by calling our `verify` API
+endpoint, which redirects the user to a Spotify login page. Once the user logs in, they
+are then redirected back to the webapp. When considering how to integration test, we
+were unsure of how to login to Spotify in order to make our API calls. For that reason
+we were only able to unit test our endpoints and mock the API responses from Spotify.
+
+### DOM tests
+
+We also faced some roadblocks in testing the application's DOM. We were able to test
+for the presence of elements on the login page (index.tsx), such as the title, description,
+login button, and information section. However, we have not yet figured out a way to test
+for the functionality of the login button on that page because it redirects externally to
+Spotify's login page.
+
+Additionally, we were unable to DOM test loggedin.tsx because it requires a valid Spotify
+authorization code or access token to render. We were unable to figure out a way to mock
+a valid authorization code or access token in order to render the page.
 
 ### Running Tests
 
@@ -154,8 +175,16 @@ This will run all tests in the '**tests**' directory.
 
 ### Known Bugs
 
-- The application does not work perfectly on safari, as the Spotify Web Playback
+- The application does not work perfectly on Safari, as the Spotify Web Playback
   SDK is not supported on Safari. The application will still work, but the buttons
   on the player have little to no functionality.
 
-### Future Features (?)
+- The web player continues to play music when the user logs out and returns to
+  the home page. This is an issue we plan to address in the future, but it is not a
+  core-functionality-breaking bug.
+
+### Future Features
+
+- Support for non-premium users: we know the webplayer is not available to these users, and the site stops functioning after songs are attempted to generate. Ideally, on full release, we will be able to display the list of songs and generate a playlist even without a functioning webplayer, so the user may have the best experience possible even without premium.
+- Full launch: improving our compliance with Spotify's privacy policy means we may petition for full access to Spotify api features, loosening the restrictions on number of users and more.
+- Personalized music: at the moment, we do not account for a user's tastes in the music generated. Accessing music from their library or filtering based on information from their profile could make CaDance a more personal experience.

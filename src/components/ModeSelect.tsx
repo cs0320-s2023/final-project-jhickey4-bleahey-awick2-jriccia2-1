@@ -7,9 +7,6 @@ import { MODE_TEXT_STANDARD, MODE_TEXT_WATCH } from "@/resources/strings";
  * The props for the ModeSelect component.
  * @interface
  * @prop {(watchMode: Mode) => void } setMode Sets the mode.
- * @prop {Metronome} metronome The metronome object.
- * @prop {boolean} metronomePlaying Whether the metronome is playing.
- * @prop {(metronomeIsPlaying: boolean) => void} setMetronomePlaying Sets whether the metronome is playing.
  */
 interface ModeSelectProps {
   /**
@@ -18,23 +15,6 @@ interface ModeSelectProps {
    * @returns {void}
    */
   setMode: (watchMode: Mode) => void;
-
-  /**
-   * The metronome object.
-   */
-  metronome: Metronome;
-
-  /**
-   * Whether the metronome is playing.
-   */
-  metronomePlaying: boolean;
-
-  /**
-   * Sets whether the metronome is playing.
-   * @param {boolean} metronomeIsPlaying Whether the metronome is playing.
-   * @returns {void}
-   */
-  setMetronomePlaying: (metronomeIsPlaying: SetStateAction<boolean>) => void;
 }
 
 /**
@@ -50,10 +30,6 @@ export default function ModeSelect(props: ModeSelectProps): JSX.Element {
       onChange={(event: ChangeEvent<HTMLSelectElement>) => {
         if (event.target.value === "watch") {
           props.setMode(Mode.Watch);
-          if (props.metronomePlaying) {
-            props.metronome.startStop();
-            props.setMetronomePlaying(!props.metronomePlaying);
-          }
         } else {
           props.setMode(Mode.Standard);
         }
